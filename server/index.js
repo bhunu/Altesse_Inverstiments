@@ -2,10 +2,24 @@ import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
 import nodemailer from 'nodemailer'
+import { fileURLToPath } from 'url'
+import { dirname, join } from 'path'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 const app = express()
+const isProd = process.env.NODE_ENV === 'production'
+
 app.use(express.json())
-app.use(cors())
+
+if (!isProd) {
+  app.use(cors())
+}
+
+if (isProd) {
+  app.use(express.static(join(__dirname, '../dist')))
+}
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -65,6 +79,12 @@ app.post('/api/contact', async (req, res) => {
     res.status(500).json({ error: 'Failed to send email' })
   }
 })
+
+if (isProd) {
+  app.get('*', (_req, res) => {
+    res.sendFile(join(__dirname, '../dist/index.html'))
+  })
+}
 
 const PORT = process.env.PORT || 5000
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`))

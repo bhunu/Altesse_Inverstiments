@@ -1,0 +1,28 @@
+Options -MultiViews
+RewriteEngine On
+
+# Route all non-file requests to index.html (SPA routing)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.html [QSA,L]
+
+# Security headers
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options nosniff
+  Header always set X-Frame-Options SAMEORIGIN
+  Header always set Referrer-Policy strict-origin-when-cross-origin
+</IfModule>
+
+# Cache static assets aggressively (Vite appends content hashes)
+<FilesMatch "\.(js|css|woff2?|ttf|otf|eot|svg|png|jpg|jpeg|gif|ico|webp)$">
+  <IfModule mod_headers.c>
+    Header set Cache-Control "max-age=31536000, immutable"
+  </IfModule>
+</FilesMatch>
+
+# Do not cache HTML
+<FilesMatch "\.html$">
+  <IfModule mod_headers.c>
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+  </IfModule>
+</FilesMatch>

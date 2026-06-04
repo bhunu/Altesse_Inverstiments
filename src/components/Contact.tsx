@@ -171,7 +171,8 @@ export default function Contact() {
                   )}
 
                   <button type="submit" className="form-submit" disabled={loading}>
-                    {loading ? 'Sending...' : 'Send Message'}
+                    {loading && <span className="btn-spinner" />}
+                    {loading ? 'Sending…' : 'Send Message'}
                   </button>
                 </form>
               )}
