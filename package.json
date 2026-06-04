@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "server": "node server/index.js",
-    "start": "node server/index.js",
-    "dev:full": "concurrently -n frontend,backend -c cyan,yellow \"vite\" \"node server/index.js\"",
+    "server": "node server.js",
+    "start": "node server.js",
+    "dev:full": "concurrently -n frontend,backend -c cyan,yellow \"vite\" \"node server.js\"",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -17,6 +17,7 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "express-rate-limit": "^7.5.1",
     "nodemailer": "^8.0.10",
     "react": "^19.2.6",
     "react-dom": "^19.2.6"
