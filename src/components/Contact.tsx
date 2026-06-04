@@ -1,4 +1,4 @@
-import { useState, type SubmitEvent } from 'react'
+import { useState } from 'react'
 
 function PhoneIcon() {
   return (
@@ -41,35 +41,86 @@ const INFO = [
   { icon: <GlobeIcon />, label: 'Website', value: 'www.altessegroup.co.zw', href: null },
 ]
 
+type Fields = 'firstName' | 'lastName' | 'email' | 'sector' | 'message'
+type FieldErrors = Partial<Record<Fields, string>>
+
+function validateField(name: Fields, value: string): string {
+  switch (name) {
+    case 'firstName':
+    case 'lastName':
+      if (!value.trim()) return `${name === 'firstName' ? 'First' : 'Last'} name is required`
+      if (value.trim().length < 2) return 'Must be at least 2 characters'
+      return ''
+    case 'email':
+      if (!value.trim()) return 'Email address is required'
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) return 'Enter a valid email address'
+      return ''
+    case 'sector':
+      if (!value) return 'Please select an area of interest'
+      return ''
+    case 'message':
+      if (!value.trim()) return 'Message is required'
+      if (value.trim().length < 10) return 'Message must be at least 10 characters'
+      return ''
+    default:
+      return ''
+  }
+}
+
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [serverError, setServerError] = useState('')
+  const [errors, setErrors] = useState<FieldErrors>({})
+  const [touched, setTouched] = useState<Partial<Record<Fields, boolean>>>({})
 
-  async function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
+  function handleBlur(e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
+    const name = e.target.name as Fields
+    const value = e.target.value
+    setTouched(prev => ({ ...prev, [name]: true }))
+    setErrors(prev => ({ ...prev, [name]: validateField(name, value) }))
+  }
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
+    if (!touched[e.target.name as Fields]) return
+    const name = e.target.name as Fields
+    setErrors(prev => ({ ...prev, [name]: validateField(name, e.target.value) }))
+  }
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setLoading(true)
-    setError('')
+    setServerError('')
 
     const data = new FormData(e.currentTarget)
-    const payload = {
-      firstName: data.get('firstName'),
-      lastName: data.get('lastName'),
-      email: data.get('email'),
-      sector: data.get('sector'),
-      message: data.get('message'),
+    const fields: Record<Fields, string> = {
+      firstName: data.get('firstName') as string,
+      lastName: data.get('lastName') as string,
+      email: data.get('email') as string,
+      sector: data.get('sector') as string,
+      message: data.get('message') as string,
     }
 
+    const allFields = Object.keys(fields) as Fields[]
+    const newErrors: FieldErrors = {}
+    allFields.forEach(f => {
+      const msg = validateField(f, fields[f])
+      if (msg) newErrors[f] = msg
+    })
+    setTouched(Object.fromEntries(allFields.map(f => [f, true])))
+    setErrors(newErrors)
+    if (Object.keys(newErrors).length > 0) return
+
+    setLoading(true)
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(fields),
       })
       if (!res.ok) throw new Error('Server error')
       setSubmitted(true)
     } catch {
-      setError('Failed to send message. Please try again or contact us directly.')
+      setServerError('Failed to send message. Please try again or contact us directly.')
     } finally {
       setLoading(false)
     }
@@ -127,22 +178,44 @@ export default function Contact() {
                   <div className="form-row">
                     <div className="form-group">
                       <label className="form-label" htmlFor="first-name">First Name</label>
-                      <input id="first-name" name="firstName" type="text" className="form-input" placeholder="John" required />
+                      <input
+                        id="first-name" name="firstName" type="text"
+                        className={`form-input${errors.firstName ? ' form-input--error' : ''}`}
+                        placeholder="John"
+                        onBlur={handleBlur} onChange={handleChange}
+                      />
+                      {errors.firstName && <span className="form-error">{errors.firstName}</span>}
                     </div>
                     <div className="form-group">
                       <label className="form-label" htmlFor="last-name">Last Name</label>
-                      <input id="last-name" name="lastName" type="text" className="form-input" placeholder="Doe" required />
+                      <input
+                        id="last-name" name="lastName" type="text"
+                        className={`form-input${errors.lastName ? ' form-input--error' : ''}`}
+                        placeholder="Doe"
+                        onBlur={handleBlur} onChange={handleChange}
+                      />
+                      {errors.lastName && <span className="form-error">{errors.lastName}</span>}
                     </div>
                   </div>
 
                   <div className="form-group">
                     <label className="form-label" htmlFor="email">Email Address</label>
-                    <input id="email" name="email" type="email" className="form-input" placeholder="john@company.com" required />
+                    <input
+                      id="email" name="email" type="email"
+                      className={`form-input${errors.email ? ' form-input--error' : ''}`}
+                      placeholder="john@company.com"
+                      onBlur={handleBlur} onChange={handleChange}
+                    />
+                    {errors.email && <span className="form-error">{errors.email}</span>}
                   </div>
 
                   <div className="form-group">
                     <label className="form-label" htmlFor="sector">Area of Interest</label>
-                    <select id="sector" name="sector" className="form-select" required>
+                    <select
+                      id="sector" name="sector"
+                      className={`form-select${errors.sector ? ' form-input--error' : ''}`}
+                      onBlur={handleBlur} onChange={handleChange}
+                    >
                       <option value="">Select a sector...</option>
                       <option value="mining">Mining</option>
                       <option value="agriculture">Agriculture</option>
@@ -151,22 +224,23 @@ export default function Contact() {
                       <option value="logistics">Logistics</option>
                       <option value="general">General Investment</option>
                     </select>
+                    {errors.sector && <span className="form-error">{errors.sector}</span>}
                   </div>
 
                   <div className="form-group">
                     <label className="form-label" htmlFor="message">Message</label>
                     <textarea
-                      id="message"
-                      name="message"
-                      className="form-textarea"
+                      id="message" name="message"
+                      className={`form-textarea${errors.message ? ' form-input--error' : ''}`}
                       placeholder="Tell us about your interest or enquiry..."
-                      required
+                      onBlur={handleBlur} onChange={handleChange}
                     />
+                    {errors.message && <span className="form-error">{errors.message}</span>}
                   </div>
 
-                  {error && (
+                  {serverError && (
                     <p style={{ color: '#e53e3e', fontSize: '0.875rem', marginBottom: '0.75rem' }}>
-                      {error}
+                      {serverError}
                     </p>
                   )}
 

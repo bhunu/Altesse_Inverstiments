@@ -561,6 +561,8 @@ section { padding: var(--section-py) 0; position: relative; }
   background-repeat: no-repeat; background-position: right 1rem center; padding-right: 2.5rem;
 }
 .form-select option { background: var(--bg-700); color: var(--text-primary); }
+.form-input--error { border-color: #e53e3e !important; box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.18) !important; }
+.form-error { display: block; margin-top: 0.35rem; font-size: 0.8125rem; color: #e53e3e; }
 .form-submit {
   width: 100%; padding: 1rem; font-size: 1rem; font-weight: 700; letter-spacing: 0.04em;
   background: linear-gradient(135deg, var(--gold), var(--gold-dark));
