@@ -113,7 +113,7 @@ export default function Footer() {
             </div>
             <div className="footer-contact-item">
               <div className="footer-contact-lbl">Email</div>
-              <a href="mailto:bmuchini@altessegroup.co.zw" className="footer-contact-val">bmuchini@altessegroup.co.zw</a>
+              <a href="mailto:marketing@altessegroup.co.zw" className="footer-contact-val">marketing@altessegroup.co.zw</a>
             </div>
             <div className="footer-contact-item">
               <div className="footer-contact-lbl">Address</div>

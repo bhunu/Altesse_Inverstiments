@@ -36,7 +36,7 @@ function GlobeIcon() {
 
 const INFO = [
   { icon: <PhoneIcon />, label: 'Phone', value: '+263 71 468 4261', href: 'tel:+263714684261' },
-  { icon: <EmailIcon />, label: 'Email', value: 'bmuchini@altessegroup.co.zw', href: 'mailto:bmuchini@altessegroup.co.zw' },
+  { icon: <EmailIcon />, label: 'Email', value: 'marketing@altessegroup.co.zw', href: 'mailto:marketing@altessegroup.co.zw' },
   { icon: <PinIcon />, label: 'Address', value: '21 Mold Crescent Avondale, Harare', href: null },
   { icon: <GlobeIcon />, label: 'Website', value: 'www.altessegroup.co.zw', href: null },
 ]
