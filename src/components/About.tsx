@@ -1,3 +1,46 @@
+function EcosystemGraphic() {
+  const sectors = [
+    { label: 'Mining',    x: 140, y: 52 },
+    { label: 'Agri',      x: 72,  y: 88 },
+    { label: 'Telecom',   x: 72,  y: 162 },
+    { label: 'Energy',    x: 208, y: 88 },
+    { label: 'Logistics', x: 208, y: 162 },
+  ]
+  const edges: [number, number][] = [[0,1],[0,2],[0,3],[0,4],[1,2],[3,4],[1,3],[2,4]]
+  return (
+    <svg width="100%" viewBox="0 0 280 220" fill="none" aria-hidden="true" className="ecosystem-svg">
+      {/* Outer decorative ring */}
+      <circle cx="140" cy="125" r="105" stroke="rgba(201,164,74,0.08)" strokeWidth="1" strokeDasharray="4 6" />
+      <circle cx="140" cy="125" r="78"  stroke="rgba(201,164,74,0.06)" strokeWidth="1" />
+      {/* Connection lines */}
+      {edges.map(([a, b], i) => (
+        <line key={i}
+          x1={sectors[a].x} y1={sectors[a].y}
+          x2={sectors[b].x} y2={sectors[b].y}
+          stroke="rgba(201,164,74,0.18)" strokeWidth="1" strokeDasharray="4 4" />
+      ))}
+      {/* Centre hub */}
+      <circle cx="140" cy="125" r="28" fill="rgba(201,164,74,0.07)" stroke="rgba(201,164,74,0.35)" strokeWidth="1.5" />
+      <circle cx="140" cy="125" r="18" fill="rgba(201,164,74,0.1)"  stroke="rgba(201,164,74,0.5)"  strokeWidth="1" />
+      <text x="140" y="121" textAnchor="middle" fontSize="7" fontWeight="700" letterSpacing="0.12em"
+        fill="rgba(201,164,74,0.9)" fontFamily="Inter,sans-serif">ALTESSE</text>
+      <text x="140" y="132" textAnchor="middle" fontSize="6" fontWeight="600" letterSpacing="0.1em"
+        fill="rgba(201,164,74,0.6)" fontFamily="Inter,sans-serif">GROUP</text>
+      {/* Sector nodes */}
+      {sectors.map(({ label, x, y }) => (
+        <g key={label}>
+          <circle cx={x} cy={y} r="22" fill="rgba(10,26,46,0.9)" stroke="rgba(201,164,74,0.4)" strokeWidth="1.5" />
+          <circle cx={x} cy={y} r="14" fill="rgba(201,164,74,0.08)" stroke="rgba(201,164,74,0.22)" strokeWidth="1" />
+          <text x={x} y={y + 4} textAnchor="middle" fontSize="6.5" fontWeight="700" letterSpacing="0.08em"
+            fill="rgba(201,164,74,0.9)" fontFamily="Inter,sans-serif">{label.toUpperCase()}</text>
+        </g>
+      ))}
+      {/* Pulse ring on centre */}
+      <circle cx="140" cy="125" r="34" stroke="rgba(201,164,74,0.12)" strokeWidth="1" className="ecosystem-pulse" />
+    </svg>
+  )
+}
+
 function IntegrityIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
@@ -88,6 +131,10 @@ export default function About() {
           {/* Right: Core Values */}
           <div className="about-visual reveal-right">
             <div className="about-showcase">
+              <div className="about-ecosystem">
+                <EcosystemGraphic />
+                <p className="ecosystem-caption">Integrated Portfolio · 5 Sectors · 1 Vision</p>
+              </div>
               <h3 className="about-showcase-title">Our Core Values</h3>
               <div className="values-list">
                 {VALUES.map(({ icon, name, text }) => (
