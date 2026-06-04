@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type SubmitEvent } from 'react'
 
 function PhoneIcon() {
   return (
@@ -43,10 +43,36 @@ const INFO = [
 
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
-    setSubmitted(true)
+    setLoading(true)
+    setError('')
+
+    const data = new FormData(e.currentTarget)
+    const payload = {
+      firstName: data.get('firstName'),
+      lastName: data.get('lastName'),
+      email: data.get('email'),
+      sector: data.get('sector'),
+      message: data.get('message'),
+    }
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      if (!res.ok) throw new Error('Server error')
+      setSubmitted(true)
+    } catch {
+      setError('Failed to send message. Please try again or contact us directly.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -101,22 +127,22 @@ export default function Contact() {
                   <div className="form-row">
                     <div className="form-group">
                       <label className="form-label" htmlFor="first-name">First Name</label>
-                      <input id="first-name" type="text" className="form-input" placeholder="John" required />
+                      <input id="first-name" name="firstName" type="text" className="form-input" placeholder="John" required />
                     </div>
                     <div className="form-group">
                       <label className="form-label" htmlFor="last-name">Last Name</label>
-                      <input id="last-name" type="text" className="form-input" placeholder="Doe" required />
+                      <input id="last-name" name="lastName" type="text" className="form-input" placeholder="Doe" required />
                     </div>
                   </div>
 
                   <div className="form-group">
                     <label className="form-label" htmlFor="email">Email Address</label>
-                    <input id="email" type="email" className="form-input" placeholder="john@company.com" required />
+                    <input id="email" name="email" type="email" className="form-input" placeholder="john@company.com" required />
                   </div>
 
                   <div className="form-group">
                     <label className="form-label" htmlFor="sector">Area of Interest</label>
-                    <select id="sector" className="form-select" required>
+                    <select id="sector" name="sector" className="form-select" required>
                       <option value="">Select a sector...</option>
                       <option value="mining">Mining</option>
                       <option value="agriculture">Agriculture</option>
@@ -131,14 +157,21 @@ export default function Contact() {
                     <label className="form-label" htmlFor="message">Message</label>
                     <textarea
                       id="message"
+                      name="message"
                       className="form-textarea"
                       placeholder="Tell us about your interest or enquiry..."
                       required
                     />
                   </div>
 
-                  <button type="submit" className="form-submit">
-                    Send Message
+                  {error && (
+                    <p style={{ color: '#e53e3e', fontSize: '0.875rem', marginBottom: '0.75rem' }}>
+                      {error}
+                    </p>
+                  )}
+
+                  <button type="submit" className="form-submit" disabled={loading}>
+                    {loading ? 'Sending...' : 'Send Message'}
                   </button>
                 </form>
               )}
