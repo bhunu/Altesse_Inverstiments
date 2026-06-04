@@ -105,7 +105,7 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
 })
 
 // Fallback: serve React app for any non-API route
-app.get('/{*path}', (_req, res) => {
+app.get('*', (_req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'))
 })
 

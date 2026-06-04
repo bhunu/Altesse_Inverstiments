@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "server": "node server.js",
-    "start": "node server.js",
-    "dev:full": "concurrently -n frontend,backend -c cyan,yellow \"vite\" \"node server.js\"",
+    "server": "node server.cjs",
+    "start": "node server.cjs",
+    "dev:full": "concurrently -n frontend,backend -c cyan,yellow \"vite\" \"node server.cjs\"",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
